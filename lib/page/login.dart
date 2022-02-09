@@ -15,7 +15,7 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-  final formkey = GlobalKey();
+  final formkey = GlobalKey<FormState>();
 
   final TextEditingController _editingEmailController = TextEditingController();
   final TextEditingController _editingPasswordController =
@@ -25,7 +25,7 @@ class _LoginState extends State<Login> {
 
   //firebase Auth
 
- final _Auth = FirebaseAuth.instance;
+  final _Auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,9 @@ class _LoginState extends State<Login> {
       borderRadius: BorderRadius.circular(10),
       color: Colors.redAccent,
       child: MaterialButton(
-        onPressed: () {},
+        onPressed: () {
+          singIn(_editingEmailController.text, _editingPasswordController.text);
+        },
         minWidth: MediaQuery.of(context).size.width,
         child: Text(
           'SIGN IN',
@@ -103,6 +105,7 @@ class _LoginState extends State<Login> {
                       ),
 
                       //Password
+
                       TextFormField(
                         autofocus: false,
                         controller: _editingPasswordController,
@@ -196,12 +199,12 @@ class _LoginState extends State<Login> {
     if (formkey.currentState!.validate()) {
       await _Auth.signInWithEmailAndPassword(email: email, password: password)
           .then((uid) => {
-        Fluttertoast.showToast(msg: "SIGN IN SUCCESSFUL.."),
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => DashBoard())),
-      })
+                Fluttertoast.showToast(msg: "SIGN IN SUCCESSFUL.."),
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => DashBoard())),
+              })
           .catchError((e) {
-        Fluttertoast.showToast(msg: e!.massage);
+        Fluttertoast.showToast(msg:"Please Create account ");
       });
     }
   }
