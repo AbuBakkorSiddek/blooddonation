@@ -1,8 +1,9 @@
+import 'package:blooddonation/page/DashBoard.dart';
 import 'package:blooddonation/page/forgotPassword.dart';
 import 'package:blooddonation/page/register.dart';
-// import 'package:blooddonation/page/register.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 //import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -24,7 +25,7 @@ class _LoginState extends State<Login> {
 
   //firebase Auth
 
-  // final _Auth = FirebaseAuth.instance;
+ final _Auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -191,17 +192,17 @@ class _LoginState extends State<Login> {
 
   //Login Function
 
-  // void singIn(String email, String password) async {
-  //   if (formkey.currentState!.validate()) {
-  //     await _Auth.signInWithEmailAndPassword(email: email, password: password)
-  //         .then((uid) => {
-  //       Fluttertoast.showToast(msg: "SIGN IN SUCCESSFUL.."),
-  //       Navigator.of(context).pushReplacement(
-  //           MaterialPageRoute(builder: (context) => DashBoard())),
-  //     })
-  //         .catchError((e) {
-  //       Fluttertoast.showToast(msg: e!.massage);
-  //     });
-  //   }
-  // }
+  void singIn(String email, String password) async {
+    if (formkey.currentState!.validate()) {
+      await _Auth.signInWithEmailAndPassword(email: email, password: password)
+          .then((uid) => {
+        Fluttertoast.showToast(msg: "SIGN IN SUCCESSFUL.."),
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => DashBoard())),
+      })
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.massage);
+      });
+    }
+  }
 }
