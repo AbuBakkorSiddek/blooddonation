@@ -1,12 +1,11 @@
 import 'package:blooddonation/Services/fromValidation.dart';
-import 'package:blooddonation/model/user_model.dart';
-import 'package:blooddonation/page/DashBoard.dart';
+import 'package:blooddonation/main.dart';
 import 'package:blooddonation/wiget/CustomTextField.dart';
 import 'package:blooddonation/wiget/register/registerSubText.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+
 
 
 class Signup extends StatefulWidget {
@@ -18,11 +17,9 @@ class Signup extends StatefulWidget {
 
 class _SignupState extends State<Signup> {
 
-  final formkey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formkey = GlobalKey<FormState>();
 
-  //Auth
-
-  final _Auth = FirebaseAuth.instance;
+  
 
   //Gender Button
   int _value = 0;
@@ -64,13 +61,16 @@ class _SignupState extends State<Signup> {
 
   String _text = "Nothing";
 
-  FirebaseAuth _auth=FirebaseAuth.instance;
 
 
-  _registerEmail() async {
+
+  registerEmail() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    await Firebase.initializeApp();
 
     try {
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+
+      UserCredential userCredential = await auth.createUserWithEmailAndPassword(
           email: email.text, password: password.text
       );
     } on FirebaseAuthException catch (e) {
@@ -146,9 +146,7 @@ class _SignupState extends State<Signup> {
                                 return ("Please Enter Name Min.6 Character");
                               }
                             },
-                            onSaved: (value) {
-                              fullName.text = value!;
-                            },
+
                           ),
 
 
@@ -174,9 +172,7 @@ class _SignupState extends State<Signup> {
                                 return ("Please Enter Name Min.6 Character");
                               }
                             },
-                            onSaved: (value) {
-                              fullName.text = value!;
-                            },
+
                           ),
 
 
@@ -206,9 +202,7 @@ class _SignupState extends State<Signup> {
                               }
                               return null;
                             },
-                            onSaved: (value) {
-                              email.text = value!;
-                            },
+
                           ),
 
 
@@ -234,9 +228,6 @@ class _SignupState extends State<Signup> {
                                 return ("Phone Number Should be 11");
                               }
                               return null;
-                            },
-                            onSaved: (value) {
-                              phone.text = value!;
                             },
 
                           ),
@@ -343,9 +334,6 @@ class _SignupState extends State<Signup> {
                                 return ("Please Enter valid password(Min.6 Character)");
                               }
                             },
-                            onSaved: (value) {
-                              password.text = value!;
-                            },
 
 
                           ),
@@ -385,9 +373,7 @@ class _SignupState extends State<Signup> {
                                 return null;
 
                             },
-                            onSaved: (value) {
-                              conformPassword.text = value!;
-                            },
+
                           ),
 
 
@@ -398,42 +384,25 @@ class _SignupState extends State<Signup> {
                             height: 20,
                           ),
 
-                          //
-                          // Container(
-                          //   width: MediaQuery.of(context).size.width,
-                          //  height: 50,
-                          //  child: ElevatedButton(
-                          //    onPressed: (){
-                          //      if(validationSave(formkey)){
-                          //        _registerEmail();
-                          //      }
-                          //    },
-                          //    child: Text(
-                          //      'SIGN UP',
-                          //      textAlign: TextAlign.center,
-                          //      style: TextStyle(
-                          //          fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-                          //    ),
-                          //  ),
-                          // ),
 
-                          Material(
-                            elevation: 5,
-                            borderRadius: BorderRadius.circular(10),
-                            color: Colors.redAccent,
-                            child: MaterialButton(
-                              onPressed: () {
-                                signup(email.text, password.text);
-                              },
-                              minWidth: MediaQuery.of(context).size.width,
-                              child: Text(
-                                'SIGN UP',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-                              ),
-                            ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                           height: 50,
+                           child: ElevatedButton(
+                             onPressed: (){
+                               if(validationSave(formkey)){
+                                 registerEmail();
+                               }
+                             },
+                             child: Text(
+                               'SIGN UP',
+                               textAlign: TextAlign.center,
+                               style: TextStyle(
+                                   fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                             ),
+                           ),
                           ),
+
 
                           SizedBox(
                             height: 10,
@@ -489,41 +458,6 @@ class _SignupState extends State<Signup> {
   }
 
 
-
-  void signup(String email, String password) async {
-    if (formkey.currentState!.validate()) {
-      await _Auth.createUserWithEmailAndPassword(
-              email: email, password: password)
-          .then((value) => { postDetailsFireStore()})
-          .catchError((e) {
-        Fluttertoast.showToast(msg: "Error");
-      });
-    }
-  }
-
-  postDetailsFireStore() async {
-    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-
-    User? user = _Auth.currentUser;
-
-    UserModel userModel = UserModel();
-
-    userModel.fullName = fullName.text;
-    userModel.userName = userName.text;
-    userModel.email = user!.email;
-    userModel.phone = phone.text;
-    userModel.uid = user.uid;
-
-    await firebaseFirestore
-        .collection('user')
-        .doc(user.uid)
-        .set(userModel.toMap());
-
-    Fluttertoast.showToast(msg: 'Account Create Successfully');
-
-    Navigator.pushAndRemoveUntil((context),
-        MaterialPageRoute(builder: (context) => DashBoard()), (route) => false);
-  }
 
 }
 
