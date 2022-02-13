@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:blooddonation/page/login.dart';
+import 'package:blooddonation/wiget/NavigatorContext.dart';
 import 'package:flutter/material.dart';
 
 class SlashScreen extends StatefulWidget {
@@ -18,8 +19,7 @@ class _SlashScreenState extends State<SlashScreen> {
     // TODO: implement initState
     super.initState();
     Timer( Duration(seconds:3 ),
-            ()=>Navigator.push(context, MaterialPageRoute(builder: (context)=>Login()))
-    );
+            ()=>navogatorPage(context,Login()));
   }
 
   @override

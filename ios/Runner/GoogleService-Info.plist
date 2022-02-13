@@ -3,23 +3,23 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>506113893426-eih798p3drs5374mdcaoaso5chpkle4b.apps.googleusercontent.com</string>
+	<string>561710238173-bhft081sl4q2ceq2tqqst5c82qie9tvs.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.506113893426-eih798p3drs5374mdcaoaso5chpkle4b</string>
+	<string>com.googleusercontent.apps.561710238173-bhft081sl4q2ceq2tqqst5c82qie9tvs</string>
 	<key>ANDROID_CLIENT_ID</key>
-	<string>506113893426-jggq99nrj4qgtrc3ajci80h9vl15uvl9.apps.googleusercontent.com</string>
+	<string>561710238173-802v8fclicts49u63a4u09v05t7l9ivj.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCgTAzWU00817x7HHGN0lkgFSh0aPeyAgQ</string>
+	<string>AIzaSyA0MTAqFtqMAW1WvPSe5hgz0Um7SScQtqA</string>
 	<key>GCM_SENDER_ID</key>
-	<string>506113893426</string>
+	<string>561710238173</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.example.blooddonation</string>
 	<key>PROJECT_ID</key>
-	<string>blooddonationflutter-49f3c</string>
+	<string>blooddobation</string>
 	<key>STORAGE_BUCKET</key>
-	<string>blooddonationflutter-49f3c.appspot.com</string>
+	<string>blooddobation.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:506113893426:ios:38db47e7fd1e35b8aac82b</string>
+	<string>1:561710238173:ios:cd378b2d4817e7988d8e34</string>
 </dict>
 </plist>

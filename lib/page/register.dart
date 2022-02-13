@@ -1,12 +1,12 @@
 import 'package:blooddonation/model/user_model.dart';
 import 'package:blooddonation/page/DashBoard.dart';
-import 'package:blooddonation/page/login.dart';
-import 'package:blooddonation/page/varify.dart';
+import 'package:blooddonation/wiget/CustomTextField.dart';
+import 'package:blooddonation/wiget/register/registerSubText.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:email_auth/email_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:firebase_database/firebase_database.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -16,48 +16,38 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
-
-
-
-
-  void sendOTP()async{
-
-    EmailAuth.sessionName = "Company Name";
-    bool result = await EmailAuth.sendOtp(receiverMail: email.value.text);
-    if (result) {
-      setState(() {
-        submitValid = true;
-      });
-    }
-  }
-
-
-  void verify() {
-    EmailAuth.validate(
-        receiverMail: email.value.text,
-        userOTP: OtpController.value.text);
-  }
-
-
   final formkey = GlobalKey<FormState>();
-
-
 
   //Auth
 
   final _Auth = FirebaseAuth.instance;
 
   //Gender Button
-  int _value=0;
-
-  //Blood Button
-
-  int _val=0;
+  int _value = 0;
 
 //togolButton;
   bool passhide = true;
 
+
+  PasswordShowHide(){
+
+    setState(() {
+      passhide=true;
+    });
+
+  }
+
+
   bool confHide = true;
+
+
+  ConfPasswordShowHide(){
+
+    setState(() {
+      confHide=true;
+    });
+
+  }
 
   final TextEditingController fullName = TextEditingController();
   final TextEditingController userName = TextEditingController();
@@ -67,31 +57,15 @@ class _SignupState extends State<Signup> {
   final TextEditingController bloodGroup = TextEditingController();
   final TextEditingController password = TextEditingController();
   final TextEditingController conformPassword = TextEditingController();
-  final TextEditingController OtpController = TextEditingController();
 
+  List<String> _blood = ['A+', 'A-', 'AB+', 'AB-', 'B+', 'B-', 'O+', 'O-'];
 
+  String _text = "Nothing";
+
+  final databaseRf = FirebaseDatabase.instance.reference();
 
   @override
   Widget build(BuildContext context) {
-    final signUpButton = Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(10),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        onPressed: () {
-          verify();
-          signup(email.text, password.text);
-        },
-        minWidth: MediaQuery.of(context).size.width,
-        child: Text(
-          'SIGN UP',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-    );
-
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -116,7 +90,7 @@ class _SignupState extends State<Signup> {
                 children: [
                   Container(
                     child: Padding(
-                      padding: const EdgeInsets.only(right: 130),
+                      padding: const EdgeInsets.only(right: 140),
                       child: Text(
                         'Create Account',
                         style: TextStyle(color: Colors.red, fontSize: 30),
@@ -124,75 +98,126 @@ class _SignupState extends State<Signup> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(36.0),
+                    padding: const EdgeInsets.all(30.0),
                     child: Form(
                       key: formkey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
+
                           //fullName
+                          CustomTextField(
+                            autofocus: false,
+                            controller: fullName,
+                            hintText: 'Full Name',
+                            labelText: 'Full Name',
+                            prifixicon: Icon(Icons.account_box_outlined),
+                            textInputAction: TextInputAction.next,
+                            keyBoardType: TextInputType.name,
+                            validator: (value) {
+                              RegExp regExp = RegExp(r'^.{6,}$');
+                              if (value!.isEmpty) {
+                                return ("Please Enter Your Full Name");
+                              }
+                              if (!regExp.hasMatch(value)) {
+                                return ("Please Enter Name Min.6 Character");
+                              }
+                            },
+                            onSaved: (value) {
+                              fullName.text = value!;
+                            },
+                          ),
 
-                          TextFormField(
-                              autofocus: false,
-                              controller: fullName,
-                              keyboardType: TextInputType.name,
-                              validator: (value) {
-                                RegExp regExp = RegExp(r'^.{6,}$');
-                                if (value!.isEmpty) {
-                                  return ("Please Enter Your Full Name");
-                                }
-                                if (!regExp.hasMatch(value)) {
-                                  return ("Please Enter Name Min.6 Character");
-                                }
-                              },
-
-                              onSaved: (value) {
-                                fullName.text = value!;
-                              },
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                  hintText: "Enter Your Name",
-                                  labelText: "Full Name",
-                                  prefixIcon: Icon(Icons.account_box_outlined),
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(20, 15, 20, 15),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10)))),
 
                           SizedBox(
                             height: 20,
                           ),
 
                           //userName
-                          TextFormField(
-                              autofocus: false,
-                              controller: userName,
-                              keyboardType: TextInputType.name,
-                              validator: (value) {
-                                RegExp regExp = RegExp(r'^.{6,}$');
-                                if (value!.isEmpty) {
-                                  return ("Please Enter Your User Name");
-                                }
-                                if (!regExp.hasMatch(value)) {
-                                  return ("Please Enter Name Min.6 Character");
-                                }
-                              },
-                              onSaved: (value) {
-                                fullName.text = value!;
-                              },
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                  hintText: "User Name",
-                                  labelText: "User Name",
-                                  prefixIcon: Icon(Icons.account_circle),
-                                  contentPadding:
-                                      EdgeInsets.fromLTRB(20, 15, 20, 15),
-                                  border: OutlineInputBorder(
-                                      borderRadius:
-                                          BorderRadius.circular(10)))),
+                          CustomTextField(
+                            autofocus:false,
+                            controller: userName,
+                            keyBoardType: TextInputType.name,
+                            textInputAction: TextInputAction.next,
+                            hintText: 'User Name',
+                            labelText: 'User Name',
+                            prifixicon: Icon(Icons.account_circle),
+                            validator: (value) {
+                              RegExp regExp = RegExp(r'^.{6,}$');
+                              if (value!.isEmpty) {
+                                return ("Please Enter Your User Name");
+                              }
+                              if (!regExp.hasMatch(value)) {
+                                return ("Please Enter Name Min.6 Character");
+                              }
+                            },
+                            onSaved: (value) {
+                              fullName.text = value!;
+                            },
+                          ),
 
+
+                          SizedBox(
+                            height: 20,
+                          ),
+
+                          //email
+
+                          CustomTextField(
+                            autofocus: false,
+                            controller: email,
+                            hintText: 'email',
+                            labelText: 'email',
+                            prifixicon: Icon(Icons.email_outlined),
+                            textInputAction: TextInputAction.next,
+                            keyBoardType: TextInputType.emailAddress,
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return ("Please Enter Your Email");
+                              }
+                              if (!RegExp(
+                                  "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
+                                  .hasMatch(value))
+                              {
+                                return ("Please Enter a valid Email");
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              email.text = value!;
+                            },
+                          ),
+
+
+                          SizedBox(
+                            height: 20,
+                          ),
+
+                          //phone
+
+                          CustomTextField(
+                              autofocus: false,
+                              controller:phone,
+                              keyBoardType: TextInputType.phone,
+                              hintText: 'Phone',
+                              labelText: 'Phone',
+                              textInputAction: TextInputAction.next,
+                              prifixicon: Icon(Icons.phone) ,
+                              validator: (value) {
+                              if (value!.isEmpty) {
+                                return ("Please Enter Your Phone");
+                              }
+                              if (value.length < 11) {
+                                return ("Phone Number Should be 11");
+                              }
+                              return null;
+                            },
+                            onSaved: (value) {
+                              phone.text = value!;
+                            },
+
+                          ),
 
 
                           SizedBox(
@@ -202,46 +227,21 @@ class _SignupState extends State<Signup> {
                           //Gender
 
                           Padding(
-                              padding: const EdgeInsets.only(right: 130),
-                              child: Text(
-                                'Choose Your Gender',
-                                style: TextStyle(color: Colors.red, fontSize: 20,fontWeight: FontWeight.bold),
-                              ),
+                            padding: const EdgeInsets.only(right: 130),
+                            child: Text(
+                              'Choose Your Gender',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold),
                             ),
+                          ),
 
                           SizedBox(
-                            height: 10,
+                            height: 15,
                           ),
 
-                          Row(
-                            children: [
-
-                              Radio(value: 1, groupValue: _value, onChanged: (int?value){
-                                setState(() {
-                                  _value=value!;
-                                });
-                              }),
-                              Text('Male'),
-
-
-                              Radio(value: 2, groupValue: _value, onChanged: (int?value){
-                                setState(() {
-                                  _value=value!;
-                                });
-                              }),
-                              Text('Female'),
-
-
-                              Radio(value: 3, groupValue: _value, onChanged: (int?value){
-                                setState(() {
-                                  _value=value!;
-                                });
-                              }),
-                              Text('Other'),
-
-                            ],
-                          ),
-
+                          buildRadioButton(),
 
                           SizedBox(
                             height: 20,
@@ -249,244 +249,98 @@ class _SignupState extends State<Signup> {
 
                           //Blood Group
 
-                          Padding(
-                            padding: const EdgeInsets.only(right: 130),
-                            child: Text(
-                              'Choose Blood Group',
-                              style: TextStyle(color: Colors.red, fontSize: 20,fontWeight: FontWeight.bold),
-                            ),
-                          ),
-
-                          Column(
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 1, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('A+'),
-                                ],
+                              Text(
+                                'Blood Group',
+                                style: TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(
+                                width: 13,
+                              ),
+                              Text(
+                                _text,
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
                               ),
 
-
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 2, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('A-  '),
-                                ],
+                              SizedBox(
+                                width: 50.0,
                               ),
 
+                              DropdownButton(
+                                  items: _blood
+                                      .map((value) => DropdownMenuItem(
+                                          value: value,
+                                          child: Text(
+                                            value,
+                                          )))
+                                      .toList(),
+                                  onChanged: (value) {
+                                    _text = value.toString();
 
+                                    print(value);
 
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 3, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('B+'),
-                                ],
-                              ),
-
-
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 4, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('B-'),
-                                ],
-                              ),
-
-
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 5, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('AB+'),
-                                ],
-                              ),
-
-
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 6, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('AB-'),
-                                ],
-                              ),
-
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 7, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('O+'),
-                                ],
-                              ),
-
-
-
-
-                              Row(
-
-                                mainAxisAlignment: MainAxisAlignment.center,
-
-                                children: [
-                                  Radio(value: 8, groupValue: _val, onChanged: (int?value){
-                                    setState(() {
-                                      _val=value!;
-                                    });
-                                  }),
-                                  Text('O-'),
-                                ],
-                              ),
-
-
-
-
+                                    setState(() {});
+                                  })
                             ],
                           ),
-
-
-                          SizedBox(
-                            height: 10,
-                          ),
-
-
 
                           SizedBox(
                             height: 20,
                           ),
 
                           //password
-                          TextFormField(
+                          CustomTextField(
                             autofocus: false,
                             controller: password,
-                            obscureText: true,
-                            validator: (value) {
-                              RegExp regExp = RegExp(r'^.{6,}$');
-                              if (value!.isEmpty) {
-                                return ("Please Enter Your Password");
-                              }
-                              if (!regExp.hasMatch(value)) {
-                                return ("Please Enter valid password(Min.6 Character)");
-                              }
-                            },
-                            onSaved: (value) {
-                              password.text = value!;
-                            },
+                            obscuretext: !passhide,
                             textInputAction: TextInputAction.next,
-                            decoration: InputDecoration(
-                              hintText: "Password",
-                              labelText: "Password",
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              prefixIcon: Icon(Icons.lock_clock_outlined),
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(20, 15, 20, 15),
-                              suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      passhide = !passhide;
-                                    });
-                                  },
-                                  icon: passhide
-                                      ? Icon(Icons.visibility_off)
-                                      : Icon(Icons.visibility)),
+                            hintText: 'Password',
+                            labelText: 'Password',
+                            prifixicon: Icon(Icons.lock_clock_outlined),
+                            sufixicon:IconButton(
+                              onPressed: (){
+                                PasswordShowHide();
+                              },
+                              icon:passhide?Icon(Icons.visibility):Icon(Icons.visibility_off),
                             ),
+
+
                           ),
+
 
                           SizedBox(
                             height: 20,
                           ),
 
                           //conformPassword
-                          TextFormField(
-                            autofocus: false,
-                            controller: conformPassword,
-                            obscureText: true,
-                            validator: (value) {
 
-                              if (conformPassword.text!= password.text) {
-                                return ("Password don't match");
-                              }
-                              return null;
 
-                            },
-                            onSaved: (value) {
-                              conformPassword.text = value!;
-                            },
-                            textInputAction: TextInputAction.next,
-                            decoration: InputDecoration(
-                              hintText: "Conform Password",
-                              labelText: "Conform Password",
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              prefixIcon: Icon(Icons.lock_clock_outlined),
-                              contentPadding:
-                                  EdgeInsets.fromLTRB(20, 15, 20, 15),
-                              suffixIcon: IconButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      confHide = !confHide;
-                                    });
-                                  },
-                                  icon: confHide
-                                      ? Icon(Icons.visibility_off)
-                                      : Icon(Icons.visibility)),
+
+
+                          CustomTextField(
+                              autofocus: false,
+                              controller: conformPassword,
+                              obscuretext:!confHide,
+                              hintText: 'Conform Password',
+                              labelText: 'Conform Password',
+                            prifixicon: Icon(Icons.lock_clock_outlined),
+                            sufixicon:IconButton(
+                              onPressed: (){
+                                ConfPasswordShowHide();
+                              },
+                              icon:confHide?Icon(Icons.visibility):Icon(Icons.visibility_off),
                             ),
+
+
                           ),
 
 
@@ -494,113 +348,13 @@ class _SignupState extends State<Signup> {
                             height: 20,
                           ),
 
-
-
-                          //email
-
-
-                              Row(
-                                children: [
-                                  Expanded(
-                                      flex: 2,
-                                    child: TextFormField(
-                                          autofocus: false,
-                                          controller: email,
-                                          keyboardType: TextInputType.emailAddress,
-                                          validator: (value) {
-                                            if (value!.isEmpty) {
-                                              return ("Please Enter Your Email");
-                                            }
-                                            if (!RegExp(
-                                                "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+.[a-z]")
-                                                .hasMatch(value)) {
-                                              return ("Please Enter a valid Email");
-                                            }
-                                            return null;
-                                          },
-                                          onSaved: (value) {
-                                            fullName.text = value!;
-                                          },
-                                          textInputAction: TextInputAction.next,
-                                          decoration: InputDecoration(
-                                              hintText: "Email",
-                                              prefixIcon: Icon(Icons.email_outlined),
-                                              suffix: TextButton(
-                                                child: Text('SEND OTP',style: TextStyle(color: Colors.red),) ,
-                                                onPressed: ()=>sendOTP(),
-                                              ),
-                                              )),
-
-                                 ),
-
-                                ],
-                              ),
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                     //OTP
-
-
-                          TextFormField(
-                            autofocus: false,
-                            controller:OtpController,
-                            obscureText: true,
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return ("Please Enter Your OPT");
-                              }
-                              return null;
-                            },
-                            onSaved: (value) {
-                              password.text = value!;
-                            },
-                            textInputAction: TextInputAction.next,
-                            decoration: InputDecoration(
-                              hintText: "Please Enter Your OPT",
-                              labelText: "OTP",
-                              border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10)),
-                              prefixIcon: Icon(Icons.verified_user_outlined),
-                              contentPadding:
-                              EdgeInsets.fromLTRB(20, 15, 20, 15),
-                            ),
-                          ),
-
-
-                          SizedBox(
-                            height: 20,
-                          ),
-
-                          signUpButton,
+                          SingUpButton(context),
 
                           SizedBox(
                             height: 10,
                           ),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                "Already have an account?",
-                                style: TextStyle(fontSize: 18),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => Login()));
-                                },
-                                child: Text(' SIGN IN',
-                                    style: TextStyle(
-                                        fontSize: 23,
-                                        color: Colors.redAccent,
-                                        fontWeight: FontWeight.bold)),
-                              )
-                            ],
-                          ),
+                          RowSubText(),
                         ],
                       ),
                     ),
@@ -614,55 +368,96 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  void signup(String email,String password)async{
-
-
-
-
-    Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Varify()),
-            (route) => false);
-
-    //
-    // if(formkey.currentState!.validate()){
-    //
-    //   await _Auth.createUserWithEmailAndPassword(email: email, password: password).then((value) =>
-    //
-    //       {
-    //
-    //         postDetailsFireStore()
-    //
-    //       }).catchError((e){
-    //         Fluttertoast.showToast(msg: e!.Massage);
-    //   });
-    //
-    // }
-
+  Row buildRadioButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Radio(
+            value: 1,
+            groupValue: _value,
+            onChanged: (int? value) {
+              setState(() {
+                _value = value!;
+              });
+            }),
+        Text('Male'),
+        Radio(
+            value: 2,
+            groupValue: _value,
+            onChanged: (int? value) {
+              setState(() {
+                _value = value!;
+              });
+            }),
+        Text('Female'),
+        Radio(
+            value: 3,
+            groupValue: _value,
+            onChanged: (int? value) {
+              setState(() {
+                _value = value!;
+              });
+            }),
+        Text('Other'),
+      ],
+    );
   }
 
-//   postDetailsFireStore()async{
-//
-//     FirebaseFirestore firebaseFirestore=FirebaseFirestore.instance;
-//
-//     User?user =_Auth.currentUser;
-//
-//
-//     UserModel userModel=UserModel();
-//
-//     userModel.fullName=fullName.text;
-//     userModel.userName=userName.text;
-//     userModel.email=user!.email;
-//     userModel.phone=phone.text;
-//     userModel.uid=user!.uid;
-//
-//     await firebaseFirestore.collection('user').doc(user.uid).set(userModel.toMap());
-//
-//     Fluttertoast.showToast(msg: 'Account Create Successfully');
-//
-//
-//     Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Varify()),
-//             (route) => false);
-//
-// }
+  Material SingUpButton(BuildContext context) {
+    return Material(
+      elevation: 5,
+      borderRadius: BorderRadius.circular(10),
+      color: Colors.redAccent,
+      child: MaterialButton(
+        onPressed: () {
+          signup(email.text, password.text);
+        },
+        minWidth: MediaQuery.of(context).size.width,
+        child: Text(
+          'SIGN UP',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      ),
+    );
+  }
 
+  void signup(String email, String password) async {
+    if (formkey.currentState!.validate()) {
+      await _Auth.createUserWithEmailAndPassword(
+              email: email, password: password)
+          .then((value) => { postDetailsFireStore()})
+          .catchError((e) {
+        Fluttertoast.showToast(msg: "Error");
+      });
+    }
+  }
+
+  postDetailsFireStore() async {
+    FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+    User? user = _Auth.currentUser;
+
+    UserModel userModel = UserModel();
+
+    userModel.fullName = fullName.text;
+    userModel.userName = userName.text;
+    userModel.email = user!.email;
+    userModel.phone = phone.text;
+    userModel.uid = user.uid;
+
+    await firebaseFirestore
+        .collection('user')
+        .doc(user.uid)
+        .set(userModel.toMap());
+
+    Fluttertoast.showToast(msg: 'Account Create Successfully');
+
+    Navigator.pushAndRemoveUntil((context),
+        MaterialPageRoute(builder: (context) => DashBoard()), (route) => false);
+  }
 
 }
+
+
