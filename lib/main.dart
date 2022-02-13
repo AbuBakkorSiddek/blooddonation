@@ -1,5 +1,4 @@
 
-import 'package:blooddonation/page/DashBoard.dart';
 import 'package:blooddonation/page/slashScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
