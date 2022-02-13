@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
                           labelText: 'Email',
                           keyBoardType: TextInputType.emailAddress,
                           prifixicon: Icon(Icons.email_outlined),
-                          textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.done,
                           validator: (value) {
                             if (value!.isEmpty) {
                               return ("Please Enter Your Email");

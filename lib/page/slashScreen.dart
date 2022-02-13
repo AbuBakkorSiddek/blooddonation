@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:blooddonation/page/login.dart';
-import 'package:blooddonation/wiget/NavigatorContext.dart';
+import 'package:blooddonation/Services/NavigatorContext.dart';
 import 'package:flutter/material.dart';
 
 class SlashScreen extends StatefulWidget {

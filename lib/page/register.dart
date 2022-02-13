@@ -1,3 +1,4 @@
+import 'package:blooddonation/Services/fromValidation.dart';
 import 'package:blooddonation/model/user_model.dart';
 import 'package:blooddonation/page/DashBoard.dart';
 import 'package:blooddonation/wiget/CustomTextField.dart';
@@ -6,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:firebase_database/firebase_database.dart';
+
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -16,6 +17,7 @@ class Signup extends StatefulWidget {
 }
 
 class _SignupState extends State<Signup> {
+
   final formkey = GlobalKey<FormState>();
 
   //Auth
@@ -62,7 +64,27 @@ class _SignupState extends State<Signup> {
 
   String _text = "Nothing";
 
-  final databaseRf = FirebaseDatabase.instance.reference();
+  FirebaseAuth _auth=FirebaseAuth.instance;
+
+
+  _registerEmail() async {
+
+    try {
+      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+          email: email.text, password: password.text
+      );
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        print('The password provided is too weak.');
+      } else if (e.code == 'email-already-in-use') {
+        print('The account already exists for that email.');
+      }
+    } catch (e) {
+      print(e);
+    }
+
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -312,6 +334,18 @@ class _SignupState extends State<Signup> {
                               },
                               icon:passhide?Icon(Icons.visibility):Icon(Icons.visibility_off),
                             ),
+                            validator: (value) {
+                              RegExp regExp = RegExp(r'^.{6,}$');
+                              if (value!.isEmpty) {
+                                return ("Please Enter Your Password");
+                              }
+                              if (!regExp.hasMatch(value)) {
+                                return ("Please Enter valid password(Min.6 Character)");
+                              }
+                            },
+                            onSaved: (value) {
+                              password.text = value!;
+                            },
 
 
                           ),
@@ -325,13 +359,13 @@ class _SignupState extends State<Signup> {
 
 
 
-
                           CustomTextField(
                               autofocus: false,
                               controller: conformPassword,
                               obscuretext:!confHide,
                               hintText: 'Conform Password',
                               labelText: 'Conform Password',
+
                             prifixicon: Icon(Icons.lock_clock_outlined),
                             sufixicon:IconButton(
                               onPressed: (){
@@ -340,15 +374,66 @@ class _SignupState extends State<Signup> {
                               icon:confHide?Icon(Icons.visibility):Icon(Icons.visibility_off),
                             ),
 
+                            validator: (value) {
 
+                              if (conformPassword.text!=password.text
+
+                              ) {
+                                return ("Password dost not match");
+                              }
+
+                                return null;
+
+                            },
+                            onSaved: (value) {
+                              conformPassword.text = value!;
+                            },
                           ),
+
+
+
 
 
                           SizedBox(
                             height: 20,
                           ),
 
-                          SingUpButton(context),
+                          //
+                          // Container(
+                          //   width: MediaQuery.of(context).size.width,
+                          //  height: 50,
+                          //  child: ElevatedButton(
+                          //    onPressed: (){
+                          //      if(validationSave(formkey)){
+                          //        _registerEmail();
+                          //      }
+                          //    },
+                          //    child: Text(
+                          //      'SIGN UP',
+                          //      textAlign: TextAlign.center,
+                          //      style: TextStyle(
+                          //          fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                          //    ),
+                          //  ),
+                          // ),
+
+                          Material(
+                            elevation: 5,
+                            borderRadius: BorderRadius.circular(10),
+                            color: Colors.redAccent,
+                            child: MaterialButton(
+                              onPressed: () {
+                                signup(email.text, password.text);
+                              },
+                              minWidth: MediaQuery.of(context).size.width,
+                              child: Text(
+                                'SIGN UP',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                            ),
+                          ),
 
                           SizedBox(
                             height: 10,
@@ -403,25 +488,7 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  Material SingUpButton(BuildContext context) {
-    return Material(
-      elevation: 5,
-      borderRadius: BorderRadius.circular(10),
-      color: Colors.redAccent,
-      child: MaterialButton(
-        onPressed: () {
-          signup(email.text, password.text);
-        },
-        minWidth: MediaQuery.of(context).size.width,
-        child: Text(
-          'SIGN UP',
-          textAlign: TextAlign.center,
-          style: TextStyle(
-              fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white),
-        ),
-      ),
-    );
-  }
+
 
   void signup(String email, String password) async {
     if (formkey.currentState!.validate()) {
